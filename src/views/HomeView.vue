@@ -1,89 +1,59 @@
 <template>
     <main>
-        <select v-model="selectedBuilding">
-            <option value="">--Sélection du bâtiment--</option>
-            <option v-for="(building, index) in buildings" :key="index" :value="index">
-                {{ building.name }}
-            </option>
-        </select>
-
-        <details v-if="selectedBuilding !== ''">
-            <summary>{{ buildings[selectedBuilding].name }}</summary>
-            <ul>
-                <li v-for="(floor, floorIndex) in buildings[selectedBuilding].children" :key="floorIndex">
-                    <details>
-                        <summary>{{ floor.name }}</summary>
-                        <ul>
-                            <li v-for="(room, roomIndex) in floor.children" :key="roomIndex">
-                                <span>{{ room.name }}</span> -
-                                <span v-if="roomStatuses[room.dynamicId] !== undefined">
-                                    {{ roomStatuses[room.dynamicId] ? 'Occupé' : 'Non Occupé' }}
-                                </span>
-                                <span v-else>Indéfini</span>
-                            </li>
-                        </ul>
-                    </details>
-                </li>
-            </ul>
-        </details>
+        <SelectionSection :buildings="buildings" @floor-selected="handleFloorSelected" />
+        <FloorDetailSection :selectedFloor="selectedFloor" :roomStatuses="roomStatuses" />
     </main>
 </template>
 
 <script setup>
 import { ref, watchEffect } from 'vue';
+import SelectionSection from "@/components/SelectionSection.vue";
+import FloorDetailSection from "@/components/FloorDetailSection.vue";
+import { fetchBuildings, fetchRoomStatus } from '@/services/apiService';
 
 const buildings = ref([]);
 const selectedBuilding = ref('');
+const selectedFloor = ref(null);
 const roomStatuses = ref({});
 
-// Fonction pour récupérer les données des bâtiments
-const fetchBuildings = async () => {
-    try {
-        const response = await fetch("https://api-developers.spinalcom.com/api/v1/geographicContext/space");
-        const data = await response.json();
-        buildings.value = data.children;
-    } catch (error) {
-        console.error("Erreur lors de la récupération des données des bâtiments :", error);
+const handleFloorSelected = async (floor) => {
+    selectedFloor.value = floor;
+    await fetchRoomStatuses(floor);
+};
+
+const fetchRoomStatuses = async (floor) => {
+    if (floor) {
+        floor.children.forEach(async room => {
+            const status = await fetchRoomStatus(room.dynamicId);
+            roomStatuses.value[room.dynamicId] = status;
+        });
     }
 };
 
-// Fonction pour récupérer le statut des pièces
-const fetchRoomStatus = async (dynamicId) => {
-    try {
-        const response = await fetch(`https://api-developers.spinalcom.com/api/v1/room/${dynamicId}/control_endpoint_list`);
-        const data = await response.json();
-        if (data && data[0] && data[0].endpoints) {
-            const occupancyEndpoint = data[0].endpoints.find(endpoint => endpoint.name === 'Occupation');
-            if (occupancyEndpoint) {
-                roomStatuses.value[dynamicId] = occupancyEndpoint.currentValue;
-            } else {
-                roomStatuses.value[dynamicId] = undefined;
-            }
-        } else {
-            roomStatuses.value[dynamicId] = undefined;
-        }
-    } catch (error) {
-        console.error(`Erreur lors de la récupération des données des points de contrôle pour la pièce ${dynamicId} :`, error);
-        roomStatuses.value[dynamicId] = undefined;
-    }
-};
-
-// Surveillance des changements dans le bâtiment sélectionné pour charger les statuts des pièces
 watchEffect(() => {
     if (selectedBuilding.value !== '') {
+        selectedFloor.value = null; // Reset selected floor when a building is changed
         const building = buildings.value[selectedBuilding.value];
-        building.children.forEach(floor => {
-            floor.children.forEach(room => {
-                fetchRoomStatus(room.dynamicId);
-            });
-        });
+        fetchRoomStatuses(building);
     }
 });
 
-// Chargement initial des données des bâtiments
-fetchBuildings();
+// Fetch initial building data
+fetchBuildings().then(data => {
+    buildings.value = data;
+});
 </script>
 
 <style lang="scss" scoped>
-/* Ajoutez ici votre style */
+main {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 32px;
+    border-radius: 25px;
+    background-color: rgb(205, 213, 243);
+    padding: 32px;
+    height: 600px;
+    max-height: 80vh;
+}
 </style>

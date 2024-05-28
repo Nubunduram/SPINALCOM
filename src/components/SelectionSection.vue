@@ -9,12 +9,12 @@
 
         <div class="floors-container" v-if="selectedBuilding !== ''">
             <div v-for="(floor, floorIndex) in buildings[selectedBuilding].children" :key="floorIndex">
-                <button @click="selectFloor(floor)">
+                <button @click="selectFloor(floor, floorIndex)">
                     {{ floor.name }}
                 </button>
-                <p>Étage occupé à </p>
-                <div class="occupancy-rate">
-                    100%
+                <p v-if="clickedFloorIndex === floorIndex">Étage occupé à</p>
+                <div v-if="clickedFloorIndex === floorIndex" class="occupancy-rate">
+                    {{ getOccupancyRate(floor) }}%
                 </div>
             </div>
         </div>
@@ -22,25 +22,28 @@
 </template>
 
 <script setup>
-
 import { ref } from 'vue';
-import { defineEmits } from 'vue';
+import { defineEmits, defineProps } from 'vue';
 
-const props = defineProps(['buildings']);
+const props = defineProps(['buildings', 'roomStatuses']);
 const emit = defineEmits(['floor-selected']);
 
 const selectedBuilding = ref('');
+const clickedFloorIndex = ref(null);
 
-const selectFloor = (floor) => {
+const selectFloor = (floor, floorIndex) => {
     emit('floor-selected', floor);
+    clickedFloorIndex.value = floorIndex;
 };
 
-const calculateOccupancyRate = (floor) => {
-    const totalRooms = floor.children.length;
-    const occupiedRooms = floor.children.filter(room => roomStatuses[room.dynamicId] === true).length;
-    return totalRooms === 0 ? 0 : (occupiedRooms / totalRooms) * 100;
-};
+const getOccupancyRate = (floor) => {
+    if (!floor.children.length) return 0;
 
+    const occupiedRooms = floor.children.filter(room => props.roomStatuses[room.dynamicId] !== undefined && props.roomStatuses[room.dynamicId]);
+    const occupancyRate = ((occupiedRooms.length / floor.children.length) * 100).toFixed(0);
+
+    return occupancyRate;
+};
 </script>
 
 <style lang="scss" scoped>

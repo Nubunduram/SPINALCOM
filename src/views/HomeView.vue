@@ -1,9 +1,9 @@
 <template>
     <header>
-        <h1>Outil d'analyse d'occupation des batiments</h1>
+        <h1>Outil d'analyse d'occupation des bâtiments</h1>
     </header>
     <main>
-        <SelectionSection :buildings="buildings" @floor-selected="handleFloorSelected" />
+        <SelectionSection :buildings="buildings" @floor-selected="handleFloorSelected" :roomStatuses="roomStatuses" />
         <FloorDetailSection :selectedFloor="selectedFloor" :roomStatuses="roomStatuses" />
     </main>
 </template>
@@ -26,10 +26,11 @@ const handleFloorSelected = async (floor) => {
 
 const fetchRoomStatuses = async (floor) => {
     if (floor) {
-        floor.children.forEach(async room => {
+        const roomStatusPromises = floor.children.map(async room => {
             const status = await fetchRoomStatus(room.dynamicId);
             roomStatuses.value[room.dynamicId] = status;
         });
+        await Promise.all(roomStatusPromises);
     }
 };
 
@@ -46,6 +47,8 @@ fetchBuildings().then(data => {
     buildings.value = data;
 });
 </script>
+
+
 
 <style lang="scss" scoped>
 @import "../assets/variable";

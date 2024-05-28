@@ -1,4 +1,7 @@
 <template>
+    <header>
+        <h1>Outil d'analyse d'occupation des batiments</h1>
+    </header>
     <main>
         <SelectionSection :buildings="buildings" @floor-selected="handleFloorSelected" />
         <FloorDetailSection :selectedFloor="selectedFloor" :roomStatuses="roomStatuses" />
@@ -45,13 +48,23 @@ fetchBuildings().then(data => {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/variable";
+
+header {
+    h1 {
+        text-align: center;
+        color: var(--default-blue);
+        padding: 16px;
+        font-size: 2.5rem;
+    }
+}
+
 main {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    margin-top: 32px;
     border-radius: 25px;
-    background-color: rgb(205, 213, 243);
+    background-color: var(--light-blue);
     padding: 32px;
     height: 600px;
     max-height: 80vh;

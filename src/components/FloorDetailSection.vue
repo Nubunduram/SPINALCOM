@@ -1,10 +1,12 @@
 <template>
-  <aside v-if="selectedFloor">
-    <div v-for="room in selectedFloor.children" :key="room.dynamicId">
-      <span class="room-name">{{ room.name }}</span>
-      <span :class="getOccupancyClass(roomStatuses[room.dynamicId])" class="room-occupancy-status">
-        {{ getOccupancyText(roomStatuses[room.dynamicId]) }}
-      </span>
+  <aside>
+    <div class="aside-grid" v-if="selectedFloor">
+      <div v-for="room in selectedFloor.children" :key="room.dynamicId">
+        <span class="room-name">{{ room.name }}</span>
+        <span :class="getOccupancyClass(roomStatuses[room.dynamicId])" class="room-occupancy-status">
+          {{ getOccupancyText(roomStatuses[room.dynamicId]) }}
+        </span>
+      </div>
     </div>
   </aside>
 </template>
@@ -36,29 +38,41 @@ const getOccupancyText = (status) => {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/variable";
+
 aside {
   font-weight: 500;
+  font-size: 1.1rem;
   border-radius: 15px;
   padding: 16px;
   width: 400px;
   max-width: 35%;
-  display: grid;
-  height: fit-content;
-  max-height: 100%;
-  gap: 8px;
-  overflow-y: auto;
+  height: 100%;
+  background-color: rgba(42, 53, 75, 0.7);
 
+  .aside-title {
+    color: var(--default-white);
+    text-align: center
+  }
 
-  div {
+  .aside-grid {
+    display: grid;
+    gap: 8px;
     height: fit-content;
-    display: flex;
-    justify-content: space-between;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 15px;
-    padding: 8px 16px;
+    max-height: 100%;
+    overflow-y: auto;
 
-    .room-occupancy-status {
-      text-align: end;
+    div {
+      height: fit-content;
+      display: flex;
+      justify-content: space-between;
+      background-color: var(--default-white);
+      border-radius: 15px;
+      padding: 8px 16px;
+
+      .room-occupancy-status {
+        text-align: end;
+      }
     }
   }
 }

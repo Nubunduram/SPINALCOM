@@ -1,69 +1,89 @@
-<script setup>
-import { ref } from 'vue';
-
-// Référence pour le bâtiment sélectionné
-const selectedBuilding = ref("");
-// Données des bâtiments et des points de contrôle des pièces
-const buildings = ref([]);
-const roomControlEndpoints = ref([]);
-
-// Fonction pour obtenir les étages pour le bâtiment sélectionné
-const getFloors = (buildingName) => {
-  const building = buildings.value.find(b => b.name === buildingName);
-  return building ? building.children : [];
-};
-let occuped;
-// Appel d'API pour récupérer les données des bâtiments
-fetch("https://api-developers.spinalcom.com/api/v1/geographicContext/space")
-  .then(response => response.json())
-  .then(data => {
-
-    buildings.value = data.children;
-    // Extracting dynamic ID from the response
-    const dynamicId = data.children[0].children[0].children[2].dynamicId;
-
-    // Use the dynamic ID to fetch room control endpoints
-    fetch(`https://api-developers.spinalcom.com/api/v1/room/${dynamicId}/control_endpoint_list`)
-      .then(response => response.json())
-      .then(data => {
-        roomControlEndpoints.value = data;
-        occuped = roomControlEndpoints.value[0].endpoints[4].currentValue;
-        // (If occuped return true then affiché Occupé, if it returns false, Non Occupé, if undefined/null return Undefined)
-        console.log(roomControlEndpoints.value[0].endpoints[4].currentValue)
-      })
-      .catch(error => {
-        console.error("Erreur lors de la récupération des données des points de contrôle des pièces :", error);
-      });
-  })
-  .catch(error => {
-    console.error("Erreur lors de la récupération des données des bâtiments :", error);
-  });
-
-</script>
 <template>
-  <main>
-    <select v-model="selectedBuilding">
-      <option value="">--Sélection du bâtiment--</option>
-      <option v-for="building in buildings" :key="building.staticId" :value="building.name">{{ building.name }}</option>
-    </select>
+    <main>
+        <select v-model="selectedBuilding">
+            <option value="">--Sélection du bâtiment--</option>
+            <option v-for="(building, index) in buildings" :key="index" :value="index">
+                {{ building.name }}
+            </option>
+        </select>
 
-    <details v-if="selectedBuilding">
-      <summary>{{ selectedBuilding }}</summary>
-      <ul>
-        <li v-for="floor in getFloors(selectedBuilding)" :key="floor.staticId">
-          <details>
-            <summary>{{ floor.name }}</summary>
+        <details v-if="selectedBuilding !== ''">
+            <summary>{{ buildings[selectedBuilding].name }}</summary>
             <ul>
-              <li v-for="room in floor.children" :key="room.staticId">
-                <span>{{ room.name }}</span>
-                <span>{{ occuped }}</span>
-              </li>
+                <li v-for="(floor, floorIndex) in buildings[selectedBuilding].children" :key="floorIndex">
+                    <details>
+                        <summary>{{ floor.name }}</summary>
+                        <ul>
+                            <li v-for="(room, roomIndex) in floor.children" :key="roomIndex">
+                                <span>{{ room.name }}</span> -
+                                <span v-if="roomStatuses[room.dynamicId] !== undefined">
+                                    {{ roomStatuses[room.dynamicId] ? 'Occupé' : 'Non Occupé' }}
+                                </span>
+                                <span v-else>Indéfini</span>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
             </ul>
-          </details>
-        </li>
-      </ul>
-    </details>
-  </main>
+        </details>
+    </main>
 </template>
 
-<style lang="scss" scoped></style>
+<script setup>
+import { ref, watchEffect } from 'vue';
+
+const buildings = ref([]);
+const selectedBuilding = ref('');
+const roomStatuses = ref({});
+
+// Fonction pour récupérer les données des bâtiments
+const fetchBuildings = async () => {
+    try {
+        const response = await fetch("https://api-developers.spinalcom.com/api/v1/geographicContext/space");
+        const data = await response.json();
+        buildings.value = data.children;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des données des bâtiments :", error);
+    }
+};
+
+// Fonction pour récupérer le statut des pièces
+const fetchRoomStatus = async (dynamicId) => {
+    try {
+        const response = await fetch(`https://api-developers.spinalcom.com/api/v1/room/${dynamicId}/control_endpoint_list`);
+        const data = await response.json();
+        if (data && data[0] && data[0].endpoints) {
+            const occupancyEndpoint = data[0].endpoints.find(endpoint => endpoint.name === 'Occupation');
+            if (occupancyEndpoint) {
+                roomStatuses.value[dynamicId] = occupancyEndpoint.currentValue;
+            } else {
+                roomStatuses.value[dynamicId] = undefined;
+            }
+        } else {
+            roomStatuses.value[dynamicId] = undefined;
+        }
+    } catch (error) {
+        console.error(`Erreur lors de la récupération des données des points de contrôle pour la pièce ${dynamicId} :`, error);
+        roomStatuses.value[dynamicId] = undefined;
+    }
+};
+
+// Surveillance des changements dans le bâtiment sélectionné pour charger les statuts des pièces
+watchEffect(() => {
+    if (selectedBuilding.value !== '') {
+        const building = buildings.value[selectedBuilding.value];
+        building.children.forEach(floor => {
+            floor.children.forEach(room => {
+                fetchRoomStatus(room.dynamicId);
+            });
+        });
+    }
+});
+
+// Chargement initial des données des bâtiments
+fetchBuildings();
+</script>
+
+<style lang="scss" scoped>
+/* Ajoutez ici votre style */
+</style>

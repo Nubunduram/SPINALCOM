@@ -16,7 +16,7 @@ idées.
 
 Documentation Swagger des API de la plateforme du candidat : https://api-developers.spinalcom.com/spinalcom-API-docs/#/
 
-![screenshot](./src/assets/spincalcom.png "Screenshot")
+![screenshot](./src/assets/spinalcom.png "Screenshot")
 
 ## Installation
 

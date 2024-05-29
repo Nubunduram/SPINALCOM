@@ -1,29 +1,28 @@
-# ./
+# SPINALCOM Exercice front-end
 
-This template should help get you started developing with Vue 3 in Vite.
+![Vue.js](https://img.shields.io/badge/vuejs-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D)
+![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)
 
-## Recommended IDE Setup
+## Consigne
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Développer une application web qui, au travers d’API, affiche l’occupation de chaque pièce, par étage, du bâtiment.
+Valeur de l’occupation : TRUE si occupée, FALSE si non-occupée, UNDEFINED si on n’est pas capable de récupérer la valeur.
 
-## Customize configuration
+Le candidat sera principalement évalué sur :
+1. Sa capacité à fournir un design correct pour son application. Un exemple très basique et le travail de précédents
+étudiants sont fournis en annexe pour laisser place à la créativité de l’étudiant tout en lui donnant quelques
+idées.
+2. Sa capacité à fournir un front-end fonctionnel.
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Documentation Swagger des API de la plateforme du candidat : https://api-developers.spinalcom.com/spinalcom-API-docs/#/
 
-## Project Setup
+![screenshot](./src/assets/spincalcom.png "Screenshot")
 
-```sh
-npm install
-```
+## Installation
 
-### Compile and Hot-Reload for Development
+To run the project locally, follow these steps:
 
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+1. Clone the repository to your local machine.
+2. Navigate to the project directory.
+3. Run `npm install`.
+4. Run `npm start`.

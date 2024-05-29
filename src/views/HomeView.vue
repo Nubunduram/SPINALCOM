@@ -9,6 +9,7 @@
 </template>
 
 <script setup>
+
 import { ref, watchEffect } from 'vue';
 import SelectionSection from "@/components/SelectionSection.vue";
 import FloorDetailSection from "@/components/FloorDetailSection.vue";
@@ -34,6 +35,7 @@ const fetchRoomStatuses = async (floor) => {
     }
 };
 
+// Watch for changes in selectedBuilding and fetch room statuses accordingly
 watchEffect(() => {
     if (selectedBuilding.value !== '') {
         selectedFloor.value = null; // Reset selected floor when a building is changed
@@ -48,28 +50,44 @@ fetchBuildings().then(data => {
 });
 </script>
 
-
-
 <style lang="scss" scoped>
 @import "../assets/variable";
+@import "../assets/mixin";
 
 header {
     h1 {
         text-align: center;
-        color: var(--default-blue);
-        padding: 16px;
-        font-size: 2.5rem;
+        color: $default-blue;
+        padding: $gap-m;
+        font-size: $font-size-3xl;
     }
 }
 
 main {
-    display: flex;
+    @include flex-setter (space-between);
+    gap: $gap-sm;
     width: 100%;
-    justify-content: space-between;
-    border-radius: 25px;
-    background-color: var(--light-blue);
-    padding: 32px;
+    max-width: 1280px;
+    margin: auto;
+    border-radius: $border-radius-m;
+    background-color: $light-blue;
+    padding: $gap-xl;
+    min-height: 50dvh;
     height: 600px;
-    max-height: 80vh;
+    max-height: 70vh;
+}
+
+@media screen and (max-width: 767px) {
+    header {
+        h1 {
+            font-size: $font-size-2xl;
+        }
+    }
+
+    main {
+        @include flex-setter (initial, initial, column);
+        max-height: 80dvh;
+        padding: $gap-sm;
+    }
 }
 </style>

@@ -1,3 +1,5 @@
+@import "./variable";
+
 *,
 *::before,
 *::after {
@@ -7,10 +9,9 @@
 }
 
 body {
-    overflow: hidden;
     min-height: 100dvh;
-    color: var(--color-text);
-    background-color: var(--color-background);
+    color: $default-blue;
+    background-color: $default-white;
     transition:
         color 0.5s,
         background-color 0.5s;
@@ -34,4 +35,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
     width: 90%;
     margin: auto;
+}
+
+button {
+    cursor: pointer;
 }

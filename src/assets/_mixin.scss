@@ -1,0 +1,21 @@
+@import "./variable";
+
+@mixin container-width-setter ($width-container: $width-container) {
+    width: $width-container;
+    background-color: $container-color;
+    padding: $gap-m;
+    border-radius: $border-radius-m;
+}
+
+@mixin flex-setter ($justify-content: initial, $align-items: initial, $flex-direction: initial) {
+    display: flex;
+    justify-content: $justify-content;
+    align-items: $align-items;
+    flex-direction: $flex-direction;
+}
+
+@mixin container-sm-reponsive {
+    max-width: 100%;
+    width: 100%;
+    max-height: 50%;
+}

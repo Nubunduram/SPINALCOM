@@ -1,17 +1,36 @@
-:root {
-    --default-white: #fff;
-    --dark-white: rgb(246, 241, 241);
-    --default-gray: #f1f1f1;
-    --dark-gray: #3f3f50;
-    --default-black: #000;
+// Colors
+$container-color: rgba(42, 53, 75, 0.7);
 
-    --light-blue: rgb(236, 241, 245);
-    --default-blue: rgb(42, 53, 75);
+$default-white: #fff;
+$default-gray: rgb(52, 47, 47);
 
-    --default-orange: rgb(230, 141, 34);
-}
+$light-blue: rgb(236, 241, 245);
+$default-blue: rgb(42, 53, 75);
 
-:root {
-    --color-background: var(--default-white);
-    --color-text: var(--default-black);
-}
+$default-green: rgb(0, 125, 0);
+
+$default-orange: #e67e22;
+
+$default-red: rgb(255, 0, 0);
+
+// Dimensions
+$gap-xs: 4px;
+$gap-sm: 8px;
+$gap-m: 16px;
+$gap-l: 24px;
+$gap-xl: 32px;
+$gap-xxl: 64px;
+
+// borders
+$border-radius-sm: 5px;
+$border-radius-m: 15px;
+
+// fonts
+$font-size-m: 1rem;
+$font-size-l: 1.1rem;
+$font-size-xl: 1.2rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2.5rem;
+
+// container
+$width-container: 400px;

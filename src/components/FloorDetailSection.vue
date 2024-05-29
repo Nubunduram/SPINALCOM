@@ -3,7 +3,7 @@
     <div class="aside-grid" v-if="selectedFloor">
       <div v-for="room in selectedFloor.children" :key="room.dynamicId">
         <span class="room-name">{{ room.name }}</span>
-        <span :class="getOccupancyClass(roomStatuses[room.dynamicId])" class="room-occupancy-status">
+        <span class="occupancy-status" :class="getOccupancyClass(roomStatuses[room.dynamicId])">
           {{ getOccupancyText(roomStatuses[room.dynamicId]) }}
         </span>
       </div>
@@ -16,76 +16,72 @@ import { defineProps } from 'vue';
 
 const props = defineProps(['selectedFloor', 'roomStatuses']);
 
+// Function to change color of status by attributing class based on the status
 const getOccupancyClass = (status) => {
-  if (status === true) {
-    return 'occupied';
-  } else if (status === false) {
-    return 'not-occupied';
-  } else {
-    return 'undefined';
+  switch (status) {
+    case true:
+      return 'occupied';
+    case false:
+      return 'not-occupied';
+    default:
+      return 'undefined';
   }
 };
 
+// Function to get occupancy text based on status
 const getOccupancyText = (status) => {
-  if (status === true) {
-    return 'Occupé';
-  } else if (status === false) {
-    return 'Non Occupé';
-  } else {
-    return 'Undefined';
+  switch (status) {
+    case true:
+      return 'Occupé';
+    case false:
+      return 'Non Occupé';
+    default:
+      return 'Undefined';
   }
 };
 </script>
 
 <style lang="scss" scoped>
 @import "../assets/variable";
+@import "../assets/mixin";
 
 aside {
-  font-weight: 500;
-  font-size: 1.1rem;
-  border-radius: 15px;
-  padding: 16px;
-  width: 400px;
-  max-width: 35%;
+  @include container-width-setter($width-container);
   height: 100%;
-  background-color: rgba(42, 53, 75, 0.7);
-
-  .aside-title {
-    color: var(--default-white);
-    text-align: center
-  }
+  font-weight: 500;
+  font-size: $font-size-l;
+  flex: 1;
 
   .aside-grid {
     display: grid;
-    gap: 8px;
-    height: fit-content;
+    gap: $gap-xs;
     max-height: 100%;
     overflow-y: auto;
 
     div {
-      height: fit-content;
-      display: flex;
-      justify-content: space-between;
-      background-color: var(--default-white);
-      border-radius: 15px;
-      padding: 8px 16px;
+      @include flex-setter (space-between);
+      background-color: $default-white;
+      border-radius: $border-radius-sm;
+      padding: $gap-sm $gap-m;
+      margin: auto $gap-sm;
 
-      .room-occupancy-status {
+      .occupancy-status {
         text-align: end;
       }
     }
   }
 }
 
-.occupied {
-  color: green;
-}
+@media screen and (max-width: 767px) {
+  aside {
+    @include container-sm-reponsive;
+    padding: $gap-sm;
 
-.not-occupied {
-  color: red;
-}
-
-.undefined {
-  color: rgb(52, 47, 47);
+    .aside-grid {
+      div {
+        margin: 0;
+      }
+    }
+  }
 }
 </style>
